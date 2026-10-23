@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TastyCup - Checkout</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600&family=Work+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="style.css">
+    <!-- Checkout requires a signed-in account. Redirect before anything shows. -->
+    <script>
+        (function () {
+            var user = null;
+            try { user = JSON.parse(localStorage.getItem("tastyCupUser")); } catch (e) {}
+            if (!user) {
+                try { sessionStorage.setItem("tastyCupReturnToCheckout", "true"); } catch (e) {}
+                window.location.replace("menu.html?loginRequired=true");
+            }
+        })();
+    </script>
+</head>
+<body data-requires-auth="true">
+
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">☕ TastyCup</a>
+
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="menu.html" class="nav-link">Menu</a>
+                <a href="cart.html" class="nav-link">Cart</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
+
+            <button type="button" class="account-btn" id="accountBtn">
+                Sign In
+            </button>
+        </div>
+    </header>
+
+
+    <!-- CHECKOUT -->
+    <main class="checkout-page">
+
+        <div class="page-heading">
+            <p class="eyebrow">Almost there!</p>
+            <h1>Checkout</h1>
+            <p>Complete your order below.</p>
+        </div>
+
+        <div class="checkout-layout">
+
+            <!-- CUSTOMER INFORMATION -->
+            <section class="checkout-card">
+                <h2>Customer Information</h2>
+
+                <form id="checkoutForm">
+
+                    <div class="form-group">
+                        <label for="customerName">Full Name</label>
+                        <input
+                            type="text"
+                            id="customerName"
+                            name="customerName"
+                            placeholder="Your account name"
+                            autocomplete="name"
+                            readonly
+                            required
+                        >
+                        <small>Your name comes from your TastyCup account.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="customerPhone">Phone Number</label>
+                        <input
+                            type="tel"
+                            id="customerPhone"
+                            name="customerPhone"
+                            placeholder="09XXXXXXXXX"
+                            autocomplete="tel"
+                            pattern="09[0-9]{9}"
+                            maxlength="11"
+                            title="Enter an 11-digit Philippine mobile number starting with 09."
+                            required
+                        >
+                    </div>
+
+                    <!-- DELIVERY OR PICKUP -->
+                    <div class="fulfillment-section">
+                        <h2>How do you want your order?</h2>
+
+                        <div class="payment-options fulfillment-options">
+                            <label class="payment-option">
+                                <input type="radio" name="fulfillment" value="delivery" checked>
+                                <span>
+                                    <strong>Delivery</strong>
+                                    <small>We bring it to your address.</small>
+                                </span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input type="radio" name="fulfillment" value="pickup">
+                                <span>
+                                    <strong>Pickup</strong>
+                                    <small>You collect it at the cafe.</small>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="addressGroup">
+                        <label for="customerAddress">Delivery Address</label>
+                        <textarea
+                            id="customerAddress"
+                            name="customerAddress"
+                            rows="4"
+                            placeholder="Enter your delivery address"
+                            autocomplete="street-address"
+                            required
+                        ></textarea>
+                    </div>
+
+
+                    <!-- PAYMENT METHOD -->
+                    <div class="payment-section">
+                        <h2>Payment Method</h2>
+
+                        <div class="payment-options">
+
+                            <label class="payment-option">
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="Cash"
+                                    required
+                                >
+                                <span>
+                                    <strong>Cash on Delivery</strong>
+                                    <small>Pay when you receive your order.</small>
+                                </span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="Card"
+                                >
+                                <span>
+                                    <strong>Credit / Debit Card</strong>
+                                    <small>Demo card payment.</small>
+                                </span>
+                            </label>
+
+                            <label class="payment-option">
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="GCash"
+                                >
+                                <span>
+                                    <strong>GCash</strong>
+                                    <small>Demo GCash payment.</small>
+                                </span>
+                            </label>
+
+                        </div>
+                    </div>
+
+
+                    <!-- CARD DEMO FIELDS -->
+                    <section id="cardPaymentFields" hidden>
+                        <h3>Card Details</h3>
+                        <p class="payment-demo-note">
+                            Demo only. Use fictional details, not your real card.
+                        </p>
+
+                        <div class="form-group">
+                            <label for="demoCardName">Name on Card</label>
+                            <input
+                                type="text"
+                                id="demoCardName"
+                                placeholder="Demo Customer"
+                                autocomplete="off"
+                                maxlength="60"
+                                disabled
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="demoCardNumber">Card Number</label>
+                            <input
+                                type="text"
+                                id="demoCardNumber"
+                                placeholder="4242 4242 4242 4242"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="19"
+                                pattern="(?:[0-9]{4} ){3}[0-9]{4}|[0-9]{16}"
+                                title="For the demo, enter a 16-digit fictional card number."
+                                disabled
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="demoCardExpiry">Expiry Date</label>
+                            <input
+                                type="text"
+                                id="demoCardExpiry"
+                                placeholder="MM/YY"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="5"
+                                pattern="(0[1-9]|1[0-2])/[0-9]{2}"
+                                title="Enter the demo expiry date in MM/YY format."
+                                disabled
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="demoCardCvv">CVV</label>
+                            <input
+                                type="password"
+                                id="demoCardCvv"
+                                placeholder="123"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="4"
+                                pattern="[0-9]{3,4}"
+                                title="Enter a 3 or 4 digit fictional CVV."
+                                disabled
+                            >
+                        </div>
+                    </section>
+
+
+                    <!-- GCASH DEMO FIELDS -->
+                    <section id="gcashPaymentFields" hidden>
+                        <h3>GCash Details</h3>
+                        <p class="payment-demo-note">
+                            Demo only. Use a fictional number. No real GCash
+                            transaction will happen.
+                        </p>
+
+                        <div class="form-group">
+                            <label for="demoGcashNumber">GCash Mobile Number</label>
+                            <input
+                                type="tel"
+                                id="demoGcashNumber"
+                                placeholder="09XXXXXXXXX"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="11"
+                                pattern="09[0-9]{9}"
+                                title="Enter an 11-digit demo mobile number starting with 09."
+                                disabled
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="demoGcashReference">Demo Reference Number</label>
+                            <input
+                                type="text"
+                                id="demoGcashReference"
+                                placeholder="e.g. DEMO123456"
+                                autocomplete="off"
+                                maxlength="20"
+                                pattern="[A-Za-z0-9-]{6,20}"
+                                title="Enter a fictional reference between 6 and 20 letters or numbers."
+                                disabled
+                            >
+                        </div>
+                    </section>
+
+
+                    <p
+                        id="checkoutMessage"
+                        class="signup-message"
+                        role="status"
+                        aria-live="polite"
+                    ></p>
+
+                    <button
+                        type="submit"
+                        class="primary-btn checkout-btn"
+                        id="placeOrderBtn"
+                    >
+                        Place Order
+                    </button>
+
+                </form>
+            </section>
+
+
+            <!-- ORDER SUMMARY -->
+            <aside class="order-summary">
+                <h2>Order Summary</h2>
+
+                <div id="checkoutItems" class="checkout-items">
+                    <!-- Items are generated by js/checkout.js -->
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <strong id="checkoutSubtotal">₱0.00</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <strong id="checkoutDiscount">-₱0.00</strong>
+                </div>
+
+                <div class="summary-row">
+                    <span>Service Fee</span>
+                    <strong id="checkoutFee">₱0.00</strong>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <strong id="checkoutTotal">₱0.00</strong>
+                </div>
+
+                <a href="cart.html" class="back-cart">
+                    ← Back to Cart
+                </a>
+            </aside>
+
+        </div>
+    </main>
+
+
+    <!-- ACCOUNT / SIGN-IN MODAL -->
+    <div class="overlay" id="accountOverlay">
+        <div class="account-modal" role="dialog" aria-modal="true"
+             aria-labelledby="accountModalTitle">
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeAccount"
+                aria-label="Close sign-in"
+            >×</button>
+
+            <h2 id="accountModalTitle">Welcome to TastyCup</h2>
+            <p>Sign in to your account.</p>
+
+            <form id="signInForm">
+                <div class="form-group">
+                    <label for="signInEmail">Email</label>
+                    <input
+                        type="email"
+                        id="signInEmail"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signInPassword">Password</label>
+                    <input
+                        type="password"
+                        id="signInPassword"
+                        placeholder="Password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <p
+                    id="signInMessage"
+                    class="signup-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <button type="submit" class="primary-btn">Sign In</button>
+            </form>
+
+            <p class="signup-login">
+                Don't have an account?
+                <a href="signup.html">Create Account</a>
+            </p>
+        </div>
+    </div>
+
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+
+    <script src="js/core.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/checkout.js"></script>
+
+</body>
+</html>

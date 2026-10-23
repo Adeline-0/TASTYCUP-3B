@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TastyCup | Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #f6f1fb;
+            color: #30233d;
+            font-family: Arial, sans-serif;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        .admin-container {
+            width: 92%;
+            max-width: 1250px;
+            margin: 35px auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+
+        .admin-header h1 {
+            margin-bottom: 5px;
+        }
+
+        .admin-header p {
+            color: #766b80;
+        }
+
+        .admin-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .admin-user {
+            color: #766b80;
+            font-size: 13px;
+        }
+
+        .admin-signout {
+            min-height: 40px;
+            padding: 8px 14px;
+            border: 1px solid #ddd2e8;
+            border-radius: 7px;
+            background: white;
+            color: #6d3d91;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .back-link {
+            color: #6d3d91;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* ---------- Summary cards ---------- */
+
+        .admin-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 16px 18px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #30233d12;
+        }
+
+        .summary-card h3 {
+            font-size: 13px;
+            color: #766b80;
+            margin-top: 0;
+        }
+
+        .summary-card p {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        /* ---------- Orders panel ---------- */
+
+        .orders-panel {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #30233d12;
+        }
+
+        .orders-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .refresh-btn {
+            min-height: 40px;
+            padding: 8px 16px;
+            border: 1px solid #ddd2e8;
+            border-radius: 7px;
+            background: white;
+            color: #6d3d91;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Quick filters: big tap targets that wrap instead of scrolling */
+        .quick-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .filter-chip {
+            min-height: 44px;
+            padding: 8px 14px;
+            border: 1px solid #ddd2e8;
+            border-radius: 999px;
+            background: white;
+            color: #30233d;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .filter-chip span {
+            margin-left: 4px;
+            color: #766b80;
+            font-weight: normal;
+        }
+
+        .filter-chip.active {
+            background: #6d3d91;
+            border-color: #6d3d91;
+            color: white;
+        }
+
+        .filter-chip.active span {
+            color: #eadcf6;
+        }
+
+        .admin-notice {
+            margin-bottom: 14px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #fff0c2;
+            color: #795600;
+            font-size: 14px;
+        }
+
+        /* ---------- Orders table ---------- */
+
+        .table-wrapper {
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #eee7f3;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f7f2fb;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 13px;
+        }
+
+        td small {
+            color: #766b80;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #eee;
+        }
+
+        .status-pending          { background: #fff0c2; color: #795600; }
+        .status-preparing        { background: #dcecff; color: #174b88; }
+        .status-ready            { background: #e6e0ff; color: #3f2c96; }
+        .status-out-for-delivery { background: #ffe7cc; color: #8a4a00; }
+        .status-delivered,
+        .status-picked-up,
+        .status-completed        { background: #d9f6df; color: #216c31; }
+        .status-rejected,
+        .status-cancelled        { background: #ffe1e1; color: #a32323; }
+
+        .method-tag {
+            display: inline-block;
+            margin-bottom: 3px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #f1ecf6;
+            color: #4b3560;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* One big button per order */
+        .next-btn {
+            display: block;
+            width: 100%;
+            min-height: 52px;
+            padding: 12px 14px;
+            border: none;
+            border-radius: 9px;
+            background: #32834b;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .next-btn:hover {
+            background: #286b3d;
+        }
+
+        .done-label {
+            display: block;
+            padding: 12px 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: #216c31;
+        }
+
+        .done-label.cancelled {
+            color: #a32323;
+        }
+
+        .secondary-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .link-btn {
+            flex: 1;
+            min-height: 40px;
+            padding: 8px;
+            border: 1px solid #ddd2e8;
+            border-radius: 7px;
+            background: white;
+            color: #6d3d91;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .link-btn.danger {
+            border-color: transparent;
+            background: none;
+            color: #a32323;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #766b80;
+        }
+
+        .denied-panel {
+            text-align: center;
+            margin-top: 12vh;
+        }
+
+        .denied-panel p {
+            margin: 10px 0;
+            color: #766b80;
+        }
+
+        /* ---------- Order details popup ---------- */
+
+        .details-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background: rgba(48, 35, 61, 0.55);
+        }
+
+        .details-modal {
+            position: relative;
+            width: min(560px, 100%);
+            max-height: 92vh;
+            overflow-y: auto;
+            padding: 24px;
+            border-radius: 14px;
+            background: white;
+        }
+
+        .details-close {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: none;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 105px 1fr;
+            gap: 6px 14px;
+            margin: 14px 0;
+            font-size: 14px;
+        }
+
+        .details-grid dt {
+            color: #766b80;
+        }
+
+        .details-grid dd {
+            overflow-wrap: anywhere;
+        }
+
+        .details-items {
+            list-style: none;
+            padding: 10px 0;
+            margin: 10px 0;
+            border-top: 1px solid #eee7f3;
+            border-bottom: 1px solid #eee7f3;
+        }
+
+        .details-items li {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 3px 0;
+            font-size: 14px;
+        }
+
+        .details-history {
+            margin: 6px 0 0;
+            padding-left: 18px;
+            font-size: 13px;
+            color: #4b3560;
+        }
+
+        /* ---------- Phones and small tablets: each order becomes a card ---------- */
+
+        @media (max-width: 860px) {
+            .admin-container {
+                width: 94%;
+                margin: 18px auto;
+            }
+
+            .orders-panel {
+                padding: 14px;
+            }
+
+            table,
+            thead,
+            tbody,
+            tr,
+            td {
+                display: block;
+            }
+
+            thead {
+                position: absolute;
+                width: 1px;
+                height: 1px;
+                overflow: hidden;
+                clip: rect(0 0 0 0);
+            }
+
+            tbody tr {
+                margin-bottom: 14px;
+                padding: 4px 14px 14px;
+                border: 1px solid #e3d9ee;
+                border-radius: 12px;
+                background: #fdfbff;
+            }
+
+            tbody tr:has(.empty-message) {
+                padding: 0;
+                border: none;
+            }
+
+            td {
+                display: flex;
+                justify-content: space-between;
+                gap: 14px;
+                padding: 10px 0;
+                border-bottom: 1px solid #eee7f3;
+                font-size: 14px;
+                text-align: right;
+            }
+
+            td::before {
+                content: attr(data-label);
+                flex: 0 0 82px;
+                color: #766b80;
+                font-size: 12px;
+                font-weight: bold;
+                text-align: left;
+                text-transform: uppercase;
+            }
+
+            td > div {
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+
+            td.actions-cell {
+                display: block;
+                padding-top: 14px;
+                border-bottom: none;
+                text-align: center;
+            }
+
+            td.actions-cell::before {
+                display: none;
+            }
+
+            td.empty-message {
+                display: block;
+            }
+
+            td.empty-message::before {
+                display: none;
+            }
+
+            .admin-summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Tablets: cards sit two across so more orders fit on screen */
+        @media (min-width: 600px) and (max-width: 860px) {
+            tbody {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 14px;
+                align-items: start;
+            }
+
+            tbody tr {
+                margin-bottom: 0;
+            }
+
+            tbody tr:has(.empty-message) {
+                grid-column: 1 / -1;
+            }
+
+            .admin-summary {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        /* ---------- Section tabs (Orders / POS) ---------- */
+
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+
+        .admin-tab {
+            min-height: 44px;
+            padding: 8px 20px;
+            border: 1px solid #ddd2e8;
+            border-radius: 999px;
+            background: white;
+            color: #30233d;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .admin-tab.active {
+            background: #6d3d91;
+            border-color: #6d3d91;
+            color: white;
+        }
+
+        /* ---------- POS / Cashier ---------- */
+
+        .pos-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 390px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .pos-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #30233d12;
+        }
+
+        .pos-panel h2 {
+            margin-bottom: 12px;
+        }
+
+        .pos-order-panel {
+            position: sticky;
+            top: 16px;
+        }
+
+        .pos-products {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .pos-product {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .pos-product-add {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 8px;
+            border: 1px solid #e3d9ee;
+            border-radius: 12px;
+            background: #fdfbff;
+            color: #30233d;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .pos-product-add:hover,
+        .pos-product-add:active {
+            border-color: #6d3d91;
+            background: #f7f2fb;
+        }
+
+        .pos-product-add strong {
+            font-size: 14px;
+            line-height: 1.25;
+        }
+
+        .pos-product-photo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 64px;
+            border-radius: 9px;
+            background: #f1ecf6;
+            font-size: 38px;
+        }
+
+        .pos-product-price {
+            color: #6d3d91;
+            font-weight: bold;
+        }
+
+        .pos-size {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .pos-size button {
+            min-height: 36px;
+            border: 1px solid #ddd2e8;
+            border-radius: 7px;
+            background: white;
+            color: #30233d;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .pos-size button.active {
+            background: #6d3d91;
+            border-color: #6d3d91;
+            color: white;
+        }
+
+        .pos-items {
+            max-height: 340px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .pos-empty {
+            padding: 22px 0;
+            text-align: center;
+            color: #766b80;
+            font-size: 14px;
+        }
+
+        .pos-line {
+            display: grid;
+            grid-template-columns: 40px minmax(0, 1fr) auto;
+            grid-template-areas:
+                "photo info remove"
+                "photo qty total";
+            gap: 4px 10px;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee7f3;
+        }
+
+        .pos-line-photo {
+            grid-area: photo;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f1ecf6;
+            font-size: 22px;
+        }
+
+        .pos-line-info { grid-area: info; min-width: 0; }
+        .pos-line-info strong { display: block; font-size: 14px; }
+        .pos-line-info small { color: #766b80; }
+        .pos-qty { grid-area: qty; display: flex; align-items: center; gap: 4px; }
+        .pos-line-total { grid-area: total; text-align: right; font-size: 14px; }
+        .pos-remove { grid-area: remove; }
+
+        .pos-qty button,
+        .pos-remove {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ddd2e8;
+            border-radius: 8px;
+            background: white;
+            color: #6d3d91;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .pos-remove {
+            border-color: transparent;
+            background: none;
+            color: #a32323;
+            font-size: 16px;
+        }
+
+        .pos-qty input {
+            width: 48px;
+            height: 40px;
+            border: 1px solid #ddd2e8;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        .pos-field {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #4b3560;
+        }
+
+        .pos-field input[type="text"],
+        .pos-field input[type="number"] {
+            display: block;
+            width: 100%;
+            min-height: 44px;
+            margin-top: 4px;
+            padding: 8px 12px;
+            border: 1px solid #ddd2e8;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .pos-member {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 44px;
+            margin-bottom: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .pos-member input {
+            width: 22px;
+            height: 22px;
+        }
+
+        .pos-totals {
+            margin: 6px 0 12px;
+            padding: 10px 0;
+            border-top: 1px solid #eee7f3;
+            border-bottom: 1px solid #eee7f3;
+        }
+
+        .pos-totals div {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 14px;
+        }
+
+        .pos-totals .pos-grand {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .pos-change {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 17px;
+            font-weight: bold;
+        }
+
+        .pos-short {
+            color: #a32323;
+        }
+
+        .pos-message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #ffe1e1;
+            color: #a32323;
+            font-size: 14px;
+        }
+
+        .pos-pay {
+            display: block;
+            width: 100%;
+            min-height: 54px;
+            border: none;
+            border-radius: 9px;
+            background: #32834b;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .pos-pay:hover:not(:disabled) { background: #286b3d; }
+
+        .pos-pay:disabled {
+            background: #b9b1c2;
+            cursor: not-allowed;
+        }
+
+        .pos-clear {
+            display: block;
+            width: 100%;
+            min-height: 44px;
+            margin-top: 8px;
+            border: none;
+            background: none;
+            color: #a32323;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Mobile bar: total + jump to the order panel */
+        .pos-bar {
+            display: none;
+        }
+
+        /* ---------- Receipt ---------- */
+
+        .receipt {
+            font-family: "Courier New", monospace;
+            font-size: 13px;
+            color: #000;
+        }
+
+        .receipt-head {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .receipt-head h2 { margin: 0 0 4px; }
+        .receipt-head p { margin: 0; }
+
+        .receipt-table {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+        }
+
+        .receipt-table th,
+        .receipt-table td {
+            padding: 3px 0;
+            border-bottom: 1px dashed #999;
+            background: none;
+            font-size: 13px;
+        }
+
+        .receipt .num { text-align: right; }
+
+        .receipt-totals {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 3px 10px;
+        }
+
+        .receipt-totals dd { text-align: right; }
+        .receipt-totals .grand { font-size: 16px; font-weight: bold; }
+
+        .receipt-thanks {
+            margin-top: 14px;
+            text-align: center;
+        }
+
+        .receipt-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .receipt-actions button {
+            flex: 1;
+            min-height: 48px;
+            border: 1px solid #ddd2e8;
+            border-radius: 9px;
+            background: white;
+            color: #6d3d91;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .receipt-actions .primary {
+            border-color: #6d3d91;
+            background: #6d3d91;
+            color: white;
+        }
+
+        @media (max-width: 860px) {
+            .pos-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .pos-order-panel {
+                position: static;
+            }
+
+            .pos-panel {
+                padding: 14px;
+            }
+
+            .pos-products {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+
+            .pos-bar {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 40;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: 56px;
+                padding: 8px 18px;
+                border: none;
+                background: #6d3d91;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            #posView {
+                padding-bottom: 70px;
+            }
+        }
+
+        /* ---------- Printing: only the receipt ---------- */
+
+        @media print {
+            body > *:not(#posReceiptOverlay) {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+            }
+
+            #posReceiptOverlay {
+                position: static;
+                display: block;
+                padding: 0;
+                background: none;
+            }
+
+            #posReceiptOverlay .details-modal {
+                width: 80mm;
+                max-height: none;
+                margin: 0 auto;
+                padding: 0;
+                overflow: visible;
+            }
+
+            #posReceiptOverlay .details-close,
+            .receipt-actions {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Shown unless a signed-in, authorized employee is detected. -->
+    <main class="admin-container" id="accessDenied">
+        <section class="orders-panel denied-panel">
+            <h1>Access denied</h1>
+            <p>This page is for authorized TastyCup staff only.</p>
+            <p>
+                <a class="back-link" href="index.html?staffLogin=true">Staff sign in</a>
+                &nbsp;·&nbsp;
+                <a class="back-link" href="index.html">Back to Website</a>
+            </p>
+        </section>
+    </main>
+
+    <main class="admin-container" id="adminApp" hidden>
+
+        <header class="admin-header">
+            <div>
+                <h1>TastyCup Admin</h1>
+                <p>Manage customer orders, walk-in sales and order history.</p>
+            </div>
+
+            <div class="admin-header-actions">
+                <span id="adminUser" class="admin-user"></span>
+                <a class="back-link" href="index.html">← Back to Website</a>
+                <button type="button" id="adminSignOut" class="admin-signout">Sign Out</button>
+            </div>
+        </header>
+
+        <nav class="admin-tabs" aria-label="Admin sections">
+            <button type="button" class="admin-tab active" id="tabOrders" data-tab="orders">Orders</button>
+            <button type="button" class="admin-tab" id="tabPos" data-tab="pos">POS / Cashier</button>
+        </nav>
+
+        <div id="ordersView">
+
+        <section class="admin-summary" id="adminSummary">
+            <div class="summary-card"><h3>Total Orders</h3><p id="totalOrders">0</p></div>
+            <div class="summary-card"><h3>New</h3><p id="newOrders">0</p></div>
+            <div class="summary-card"><h3>Preparing</h3><p id="preparingOrders">0</p></div>
+            <div class="summary-card"><h3>Ready</h3><p id="readyOrders">0</p></div>
+            <div class="summary-card"><h3>Out for Delivery</h3><p id="outOrders">0</p></div>
+            <div class="summary-card"><h3>Completed</h3><p id="completedOrders">0</p></div>
+            <div class="summary-card"><h3>Cancelled</h3><p id="cancelledOrders">0</p></div>
+        </section>
+
+        <section class="orders-panel">
+            <div class="orders-toolbar">
+                <h2>Customer Orders</h2>
+                <button id="refreshOrders" type="button" class="refresh-btn">Refresh</button>
+            </div>
+
+            <!-- Quick filters (drawn by admin.js) -->
+            <div class="quick-filters" id="quickFilters" role="group" aria-label="Filter orders by status"></div>
+
+            <div class="admin-notice" id="adminNotice" role="status" aria-live="polite" hidden></div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Delivery / Pickup</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="adminOrdersBody">
+                        <tr>
+                            <td colspan="7" class="empty-message">
+                                Loading orders...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        </div><!-- /ordersView -->
+
+        <!-- POS / CASHIER (staff only; set up by js/pos.js) -->
+        <div id="posView" hidden>
+            <div class="pos-layout">
+
+                <section class="pos-panel">
+                    <h2>Menu</h2>
+                    <div class="quick-filters" id="posCategories" role="group" aria-label="Filter products by category"></div>
+                    <div class="pos-products" id="posProducts"></div>
+                </section>
+
+                <section class="pos-panel pos-order-panel" id="posOrderPanel">
+                    <h2>Current Order</h2>
+
+                    <div class="pos-items" id="posItems"></div>
+
+                    <label class="pos-field">Customer name (optional)
+                        <input type="text" id="posCustomer" maxlength="60" autocomplete="off" placeholder="Walk-in Customer">
+                    </label>
+
+                    <label class="pos-member">
+                        <input type="checkbox" id="posMember">
+                        Member (10% discount)
+                    </label>
+
+                    <div class="pos-totals">
+                        <div><span>Subtotal</span><span id="posSubtotal">₱0.00</span></div>
+                        <div id="posDiscountRow" hidden><span>Member discount (10%)</span><span id="posDiscount">-₱0.00</span></div>
+                        <div><span>Service fee (5%)</span><span id="posFee">₱0.00</span></div>
+                        <div class="pos-grand"><span>Total</span><span id="posTotal">₱0.00</span></div>
+                    </div>
+
+                    <label class="pos-field">Cash received (₱)
+                        <input type="number" id="posCash" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+                    </label>
+
+                    <div class="pos-change"><span>Change</span><span id="posChange">₱0.00</span></div>
+
+                    <div class="pos-message" id="posMessage" role="alert" hidden></div>
+
+                    <button type="button" class="pos-pay" id="posPay" disabled>Confirm Cash Payment</button>
+                    <button type="button" class="pos-clear" id="posClear">Clear order</button>
+                </section>
+
+            </div>
+
+            <button type="button" class="pos-bar" id="posBar">
+                <span id="posBarCount">0 items</span>
+                <span>Total <span id="posBarTotal">₱0.00</span> · View order ↓</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- POS RECEIPT -->
+    <div class="details-overlay" id="posReceiptOverlay" hidden>
+        <div class="details-modal" role="dialog" aria-modal="true" aria-label="Receipt">
+            <button type="button" class="details-close" id="posReceiptClose"
+                    aria-label="Close receipt">×</button>
+            <div class="receipt" id="posReceipt"></div>
+            <div class="receipt-actions">
+                <button type="button" id="posPrint" class="primary">🖨 Print Receipt</button>
+                <button type="button" id="posReceiptDone">New Order</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ORDER DETAILS -->
+    <div class="details-overlay" id="detailsOverlay" hidden>
+        <div class="details-modal" role="dialog" aria-modal="true"
+             aria-labelledby="detailsTitle">
+            <button type="button" class="details-close" id="detailsClose"
+                    aria-label="Close order details">×</button>
+            <h2 id="detailsTitle">Order details</h2>
+            <div id="detailsBody"></div>
+        </div>
+    </div>
+
+    <script src="js/core.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/orders.js"></script>
+    <script src="admin.js"></script>
+    <script src="js/pos.js"></script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TastyCup - Create Account</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">☕ TastyCup</a>
+
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="menu.html" class="nav-link">Menu</a>
+                <a href="cart.html" class="nav-link">Cart</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+            </nav>
+
+            <a href="menu.html" class="account-btn">Explore Menu</a>
+        </div>
+    </header>
+
+    <main class="signup-page">
+        <section class="signup-card">
+
+            <div class="signup-icon">☕</div>
+
+            <p class="eyebrow">WELCOME TO TASTYCUP</p>
+            <h1>Create Your Account</h1>
+
+            <p class="signup-description">
+                Join TastyCup and enjoy a little extra sweetness
+                with every order.
+            </p>
+
+            <form id="signupForm" novalidate>
+
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input
+                        type="text"
+                        id="signupName"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input
+                        type="email"
+                        id="signupEmail"
+                        placeholder="you@example.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input
+                        type="password"
+                        id="signupPassword"
+                        placeholder="At least 8 characters"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Enter your password again"
+                        minlength="8"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+
+                <p
+                    id="signupMessage"
+                    class="signup-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+                <button type="submit" class="primary-btn signup-submit">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p class="signup-login">
+                Already have an account?
+                <a href="menu.html?loginRequired=true" id="existingAccountLink">
+                    Sign In
+                </a>
+            </p>
+
+            <p class="signup-note">
+                Demo account registration for the TastyCup school project.
+            </p>
+
+        </section>
+    </main>
+
+    <script src="js/core.js"></script>
+
+    <script>
+        const signupForm = document.getElementById("signupForm");
+        const signupMessage = document.getElementById("signupMessage");
+        const signupButton = signupForm.querySelector(
+            "button[type='submit']"
+        );
+
+        function showSignupMessage(message, success = false) {
+            signupMessage.textContent = message;
+            signupMessage.className = success
+                ? "signup-message success"
+                : "signup-message error";
+        }
+
+        function getSavedUsers() {
+            const savedUsers = localStorage.getItem("tastyCupUsers");
+
+            if (!savedUsers) {
+                return [];
+            }
+
+            const users = JSON.parse(savedUsers);
+
+            if (!Array.isArray(users)) {
+                throw new Error("Saved accounts have an invalid format.");
+            }
+
+            return users;
+        }
+
+        signupForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("signupName")
+                .value.trim();
+
+            const email = document.getElementById("signupEmail")
+                .value.trim().toLowerCase();
+
+            const password = document.getElementById("signupPassword")
+                .value;
+
+            const confirmPassword = document.getElementById("confirmPassword")
+                .value;
+
+            signupMessage.textContent = "";
+            signupMessage.className = "signup-message";
+
+            if (!name || name.length < 2) {
+                showSignupMessage("Please enter your full name.");
+                return;
+            }
+
+            if (!email) {
+                showSignupMessage("Please enter your email address.");
+                return;
+            }
+
+            if (!document.getElementById("signupEmail").checkValidity()) {
+                showSignupMessage("Please enter a valid email address.");
+                return;
+            }
+
+            if (password.length < 8) {
+                showSignupMessage(
+                    "Your password must be at least 8 characters."
+                );
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showSignupMessage("Your passwords do not match.");
+                return;
+            }
+
+            if (isEmailAuthorizedStaff(email)) {
+                showSignupMessage(
+                    "This email is reserved for staff. Please use another email."
+                );
+                return;
+            }
+
+            let users;
+
+            try {
+                users = getSavedUsers();
+            } catch (error) {
+                showSignupMessage(
+                    "Unable to read saved accounts. Please try again."
+                );
+                return;
+            }
+
+            const existingUser = users.some(function (user) {
+                return user.email &&
+                    user.email.toLowerCase() === email;
+            });
+
+            if (existingUser) {
+                showSignupMessage(
+                    "An account with this email already exists."
+                );
+                return;
+            }
+
+            const newUser = {
+                name: name,
+                email: email,
+                password: password
+            };
+
+            try {
+                users.push(newUser);
+
+                localStorage.setItem(
+                    "tastyCupUsers",
+                    JSON.stringify(users)
+                );
+
+                localStorage.setItem(
+                    "tastyCupUser",
+                    JSON.stringify({
+                        name: name,
+                        email: email
+                    })
+                );
+            } catch (error) {
+                // Restore the previous account list if saving fails.
+                try {
+                    if (users.length > 0) {
+                        users.pop();
+                    }
+
+                    localStorage.setItem(
+                        "tastyCupUsers",
+                        JSON.stringify(users)
+                    );
+                } catch (restoreError) {
+                    // Storage may be unavailable or full.
+                }
+
+                showSignupMessage(
+                    "Could not save your account. Please try again."
+                );
+                return;
+            }
+
+            showSignupMessage(
+                "Account created successfully! Redirecting...",
+                true
+            );
+
+            signupButton.disabled = true;
+            signupButton.textContent = "Account Created";
+
+            const returnToCheckout =
+                sessionStorage.getItem("tastyCupReturnToCheckout") === "true";
+
+            setTimeout(function () {
+                if (returnToCheckout) {
+                    sessionStorage.removeItem("tastyCupReturnToCheckout");
+                    window.location.href = "checkout.html";
+                } else {
+                    window.location.href = "menu.html";
+                }
+            }, 800);
+        });
+    </script>
+
+</body>
+</html>
